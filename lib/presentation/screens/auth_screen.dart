@@ -160,9 +160,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _isLogin
-                              ? 'Demo Admin: admin@pos.local  •  password123'
-                              : 'Register a cashier account to access the register',
+                          _isLogin ? 'Sign in to your account' : 'Register a cashier account to access the register',
                           textAlign: TextAlign.center,
                           style: PosTypography.body(
                             context,
