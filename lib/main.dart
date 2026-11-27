@@ -5,17 +5,17 @@ import 'presentation/screens/auth_screen.dart';
 import 'presentation/screens/main_shell_screen.dart';
 
 void main() {
-  runApp(const PosThesisApp());
+  runApp(const PosApp());
 }
 
-class PosThesisApp extends StatefulWidget {
-  const PosThesisApp({super.key});
+class PosApp extends StatefulWidget {
+  const PosApp({super.key});
 
   @override
-  State<PosThesisApp> createState() => _PosThesisAppState();
+  State<PosApp> createState() => _PosAppState();
 }
 
-class _PosThesisAppState extends State<PosThesisApp> {
+class _PosAppState extends State<PosApp> {
   final PosStore _store = PosStore();
 
   @override
