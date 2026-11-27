@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pos_system/presentation/screens/auth_screen.dart';
 
 void main() {
@@ -18,11 +18,7 @@ class PosApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: AuthScreen(
-        onAuthenticated: () {
-          // TODO: Navigate to your POS / Products screen and initialize PosRepository
-        },
-      ),
+      home: AuthScreen(onAuthenticated: () {}),
     );
   }
 }
