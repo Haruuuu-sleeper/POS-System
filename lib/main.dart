@@ -1,15 +1,28 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:pos_system/presentation/screens/auth_screen.dart';
 
-// import 'presentation/screens/main_shell_screen.dart';
+import 'presentation/pos_store.dart';
+import 'presentation/screens/auth_screen.dart';
+import 'presentation/screens/main_shell_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const PosApp());
+  runApp(const PosThesisApp());
 }
 
-class PosApp extends StatelessWidget {
-  const PosApp({super.key});
+class PosThesisApp extends StatefulWidget {
+  const PosThesisApp({super.key});
+
+  @override
+  State<PosThesisApp> createState() => _PosThesisAppState();
+}
+
+class _PosThesisAppState extends State<PosThesisApp> {
+  final PosStore _store = PosStore();
+
+  @override
+  void dispose() {
+    _store.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +30,19 @@ class PosApp extends StatelessWidget {
       title: 'POS System',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: AuthScreen(onAuthenticated: () {}),
+      home: ListenableBuilder(
+        listenable: _store,
+        builder: (context, _) {
+          if (_store.currentUser == null) {
+            return AuthScreen(store: _store, onAuthenticated: () {});
+          }
+
+          return MainShellScreen(store: _store, onLogout: _store.signOut);
+        },
+      ),
     );
   }
 }

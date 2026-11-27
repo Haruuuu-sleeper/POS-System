@@ -9,8 +9,10 @@ class UsersScreen extends StatelessWidget {
 
   void _openAddUserDialog(BuildContext context) {
     final nameCtrl = TextEditingController();
-    final userCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final passwordCtrl = TextEditingController(text: 'password123');
     UserRole selectedRole = UserRole.cashier;
+    String? formError;
 
     showDialog(
       context: context,
@@ -26,8 +28,16 @@ class UsersScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: userCtrl,
-                decoration: const InputDecoration(labelText: 'Username'),
+                controller: emailCtrl,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: passwordCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Password (min 6 chars)',
+                ),
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<UserRole>(
@@ -45,6 +55,10 @@ class UsersScreen extends StatelessWidget {
                   if (v != null) setDialogState(() => selectedRole = v);
                 },
               ),
+              if (formError != null) ...[
+                const SizedBox(height: 8),
+                Text(formError!, style: const TextStyle(color: Colors.red)),
+              ],
             ],
           ),
           actions: [
@@ -55,14 +69,23 @@ class UsersScreen extends StatelessWidget {
             FilledButton(
               onPressed: () {
                 if (nameCtrl.text.trim().isEmpty ||
-                    userCtrl.text.trim().isEmpty) {
+                    emailCtrl.text.trim().isEmpty ||
+                    passwordCtrl.text.length < 6) {
+                  setDialogState(
+                    () => formError = 'Fill all fields (password >= 6 chars).',
+                  );
                   return;
                 }
-                store.addUser(
-                  nameCtrl.text.trim(),
-                  userCtrl.text.trim(),
-                  selectedRole,
+                final err = store.createStaffUser(
+                  fullName: nameCtrl.text,
+                  email: emailCtrl.text,
+                  password: passwordCtrl.text,
+                  role: selectedRole,
                 );
+                if (err != null) {
+                  setDialogState(() => formError = err);
+                  return;
+                }
                 Navigator.pop(ctx);
               },
               child: const Text('Create'),
@@ -96,17 +119,19 @@ class UsersScreen extends StatelessWidget {
         itemBuilder: (_, i) {
           final u = store.users[i];
           return ListTile(
-            leading: CircleAvatar(child: Text(u.fullName[0].toUpperCase())),
+            leading: CircleAvatar(
+              child: Text(
+                u.fullName.isNotEmpty ? u.fullName[0].toUpperCase() : '?',
+              ),
+            ),
             title: Text(
               u.fullName,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(
-              '@${u.username} • Role: ${u.role.name.toUpperCase()}',
-            ),
+            subtitle: Text('${u.email} • Role: ${u.role.name.toUpperCase()}'),
             trailing: Switch(
               value: u.isActive,
-              onChanged: u.username == 'admin'
+              onChanged: u.email == 'admin@pos.local'
                   ? null
                   : (_) => store.toggleUserStatus(u.id),
             ),

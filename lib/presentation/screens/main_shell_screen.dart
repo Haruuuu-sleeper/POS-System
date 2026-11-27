@@ -29,7 +29,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
     return ListenableBuilder(
       listenable: widget.store,
       builder: (context, _) {
-        final isAdmin = widget.store.currentUser.role == UserRole.admin;
+        final user = widget.store.currentUser;
+        final isAdmin = user?.role == UserRole.admin;
 
         final navItems = <({String label, IconData icon, Widget page})>[
           if (isAdmin)
@@ -81,14 +82,14 @@ class _MainShellScreenState extends State<MainShellScreen> {
                       const Icon(Icons.storefront, size: 32),
                       const SizedBox(height: 6),
                       Text(
-                        widget.store.currentUser.fullName,
+                        user?.fullName ?? 'Staff',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
                       ),
                       Text(
-                        widget.store.currentUser.role.name.toUpperCase(),
+                        (user?.role.name ?? 'cashier').toUpperCase(),
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.grey.shade600,

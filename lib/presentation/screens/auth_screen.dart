@@ -1,9 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../pos_store.dart';
+
 class AuthScreen extends StatefulWidget {
+  final PosStore store;
   final VoidCallback? onAuthenticated;
 
-  const AuthScreen({super.key, this.onAuthenticated});
+  const AuthScreen({super.key, required this.store, this.onAuthenticated});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -38,17 +41,35 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      // Simulate brief auth check; replace with real auth/local session logic later
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
+      await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
+
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      final fullName = _nameController.text.trim();
+
+      final error = _isLogin
+          ? widget.store.signIn(email, password)
+          : widget.store.signUp(
+              fullName: fullName,
+              email: email,
+              password: password,
+              role: UserRole.cashier,
+            );
+
+      if (error != null) {
+        setState(() => _errorMessage = error);
+        return;
+      }
+
+      _nameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
 
       widget.onAuthenticated?.call();
     } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _errorMessage = 'Authentication failed: $e';
-      });
+      setState(() => _errorMessage = 'Authentication failed: $e');
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -96,9 +117,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isLogin
-                              ? 'Cashier Sign In'
-                              : 'Create Cashier Account',
+                          _isLogin ? 'POS Sign In' : 'Create Staff Account',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -107,8 +126,8 @@ class _AuthScreenState extends State<AuthScreen> {
                         const SizedBox(height: 6),
                         Text(
                           _isLogin
-                              ? 'Sign in to access the POS register & inventory'
-                              : 'Register a staff account to start using the POS',
+                              ? 'Sign in with your account (Demo Admin: admin@pos.local / password123)'
+                              : 'Register a cashier account to access the POS register',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,

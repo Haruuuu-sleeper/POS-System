@@ -100,7 +100,6 @@ class _PosScreenState extends State<PosScreen> {
       appBar: AppBar(title: const Text('Point of Sale (Checkout)')),
       body: Row(
         children: [
-          // Left: Product Catalog
           Expanded(
             flex: 3,
             child: Padding(
@@ -210,7 +209,6 @@ class _PosScreenState extends State<PosScreen> {
             ),
           ),
           const VerticalDivider(width: 1),
-          // Right: Active Cart
           Expanded(
             flex: 2,
             child: Padding(

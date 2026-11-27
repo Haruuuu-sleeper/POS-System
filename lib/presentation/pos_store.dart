@@ -5,14 +5,16 @@ enum UserRole { admin, cashier }
 class AppUser {
   final String id;
   final String fullName;
-  final String username;
+  final String email;
+  final String password;
   final UserRole role;
   bool isActive;
 
   AppUser({
     required this.id,
     required this.fullName,
-    required this.username,
+    required this.email,
+    required this.password,
     required this.role,
     this.isActive = true,
   });
@@ -64,27 +66,24 @@ class PosOrder {
 }
 
 class PosStore extends ChangeNotifier {
-  AppUser currentUser = AppUser(
-    id: 'u1',
-    fullName: 'System Admin',
-    username: 'admin',
-    role: UserRole.admin,
-  );
-
   final List<AppUser> users = [
     AppUser(
       id: 'u1',
       fullName: 'System Admin',
-      username: 'admin',
+      email: 'admin@pos.local',
+      password: 'password123',
       role: UserRole.admin,
     ),
     AppUser(
       id: 'u2',
       fullName: 'Sokha Cashier',
-      username: 'cashier1',
+      email: 'cashier@pos.local',
+      password: 'password123',
       role: UserRole.cashier,
     ),
   ];
+
+  AppUser? currentUser;
 
   final List<Product> products = [
     Product(
@@ -146,12 +145,62 @@ class PosStore extends ChangeNotifier {
   List<Product> get lowStockProducts =>
       products.where((p) => p.stock <= 5).toList();
 
-  void setCurrentUser(AppUser user) {
-    currentUser = user;
+  // --- Auth ---
+  String? signIn(String email, String password) {
+    final normalizedEmail = email.trim().toLowerCase();
+    AppUser? matched;
+    for (final u in users) {
+      if (u.email.toLowerCase() == normalizedEmail && u.password == password) {
+        matched = u;
+        break;
+      }
+    }
+
+    if (matched == null) {
+      return 'Invalid email or password.';
+    }
+    if (!matched.isActive) {
+      return 'This account is inactive. Contact an administrator.';
+    }
+
+    currentUser = matched;
+    notifyListeners();
+    return null;
+  }
+
+  String? signUp({
+    required String fullName,
+    required String email,
+    required String password,
+    UserRole role = UserRole.cashier,
+  }) {
+    final normalizedEmail = email.trim().toLowerCase();
+    final exists = users.any((u) => u.email.toLowerCase() == normalizedEmail);
+    if (exists) {
+      return 'An account with this email already exists.';
+    }
+
+    final newUser = AppUser(
+      id: 'u${DateTime.now().millisecondsSinceEpoch}',
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      password: password,
+      role: role,
+    );
+
+    users.add(newUser);
+    currentUser = newUser;
+    notifyListeners();
+    return null;
+  }
+
+  void signOut() {
+    cart.clear();
+    currentUser = null;
     notifyListeners();
   }
 
-  // --- Cart Operations ---
+  // --- Cart & Checkout ---
   void addToCart(Product product) {
     if (product.stock <= 0) return;
     final index = cart.indexWhere((c) => c.product.id == product.id);
@@ -192,11 +241,12 @@ class PosStore extends ChangeNotifier {
       item.product.stock -= item.quantity;
     }
 
+    final cashier = currentUser?.fullName ?? 'Cashier';
     final order = PosOrder(
       invoiceNo:
           'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       createdAt: DateTime.now(),
-      cashierName: currentUser.fullName,
+      cashierName: cashier,
       items: orderItems,
       total: total,
       cashReceived: cashReceived,
@@ -249,16 +299,27 @@ class PosStore extends ChangeNotifier {
   }
 
   // --- User Management ---
-  void addUser(String fullName, String username, UserRole role) {
+  String? createStaffUser({
+    required String fullName,
+    required String email,
+    required String password,
+    required UserRole role,
+  }) {
+    final normalizedEmail = email.trim().toLowerCase();
+    if (users.any((u) => u.email.toLowerCase() == normalizedEmail)) {
+      return 'Email already in use.';
+    }
     users.add(
       AppUser(
         id: 'u${DateTime.now().millisecondsSinceEpoch}',
-        fullName: fullName,
-        username: username,
+        fullName: fullName.trim(),
+        email: normalizedEmail,
+        password: password,
         role: role,
       ),
     );
     notifyListeners();
+    return null;
   }
 
   void toggleUserStatus(String id) {
