@@ -145,7 +145,6 @@ class PosStore extends ChangeNotifier {
   List<Product> get lowStockProducts =>
       products.where((p) => p.stock <= 5).toList();
 
-  // --- Auth ---
   String? signIn(String email, String password) {
     final normalizedEmail = email.trim().toLowerCase();
     AppUser? matched;
@@ -200,7 +199,6 @@ class PosStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Cart & Checkout ---
   void addToCart(Product product) {
     if (product.stock <= 0) return;
     final index = cart.indexWhere((c) => c.product.id == product.id);
@@ -259,7 +257,6 @@ class PosStore extends ChangeNotifier {
     return order;
   }
 
-  // --- Product CRUD ---
   void saveProduct({
     String? id,
     required String name,
@@ -298,7 +295,6 @@ class PosStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- User Management ---
   String? createStaffUser({
     required String fullName,
     required String email,

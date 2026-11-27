@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../pos_store.dart';
+import '../pos_theme.dart';
 
 class DashboardScreen extends StatelessWidget {
   final PosStore store;
@@ -10,7 +11,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard & Sales Summary')),
+      appBar: AppBar(title: const Text('Command Overview')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -23,30 +24,32 @@ class DashboardScreen extends StatelessWidget {
                 _KpiCard(
                   title: "Today's Revenue",
                   value: '\$${store.todayRevenue.toStringAsFixed(2)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green,
+                  icon: Icons.payments_rounded,
+                  accent: PosColors.electricBlue,
                 ),
                 _KpiCard(
-                  title: 'Total Orders',
+                  title: 'Completed Orders',
                   value: '${store.orders.length}',
-                  icon: Icons.shopping_bag_outlined,
-                  color: Colors.blue,
+                  icon: Icons.receipt_rounded,
+                  accent: PosColors.skyPulse,
                 ),
                 _KpiCard(
-                  title: 'Total Products',
+                  title: 'Catalog Items',
                   value: '${store.products.length}',
-                  icon: Icons.inventory_2_outlined,
-                  color: Colors.indigo,
+                  icon: Icons.grid_view_rounded,
+                  accent: const Color(0xFF6366F1),
                 ),
                 _KpiCard(
                   title: 'Low Stock Alerts',
                   value: '${store.lowStockProducts.length}',
                   icon: Icons.warning_amber_rounded,
-                  color: Colors.orange,
+                  accent: store.lowStockProducts.isEmpty
+                      ? PosColors.success
+                      : PosColors.warning,
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,36 +58,86 @@ class DashboardScreen extends StatelessWidget {
                     flex: 3,
                     child: Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Recent Transactions',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.bolt_rounded,
+                                  color: PosColors.skyPulse,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Recent Transactions',
+                                  style: PosTypography.display(
+                                    context,
+                                    size: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const Divider(),
+                            const SizedBox(height: 12),
+                            const Divider(height: 1),
                             Expanded(
                               child: store.orders.isEmpty
-                                  ? const Center(
-                                      child: Text('No sales recorded yet.'),
+                                  ? Center(
+                                      child: Text(
+                                        'No sales recorded yet. Complete an order in POS Checkout.',
+                                        style: PosTypography.body(
+                                          context,
+                                          color: PosColors.textSecondary,
+                                        ),
+                                      ),
                                     )
-                                  : ListView.builder(
+                                  : ListView.separated(
                                       itemCount: store.orders.length,
+                                      separatorBuilder: (_, _) =>
+                                          const Divider(height: 1),
                                       itemBuilder: (_, i) {
                                         final o = store.orders[i];
                                         return ListTile(
-                                          title: Text(o.invoiceNo),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                                vertical: 4,
+                                              ),
+                                          leading: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              color: PosColors.deepNavyTint,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.receipt_long_rounded,
+                                              color: PosColors.skyPulse,
+                                              size: 18,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            o.invoiceNo,
+                                            style: PosTypography.mono(
+                                              context,
+                                              size: 13.5,
+                                            ),
+                                          ),
                                           subtitle: Text(
-                                            'Cashier: ${o.cashierName} • ${o.items.length} items',
+                                            '${o.cashierName} • ${o.items.length} items',
+                                            style: PosTypography.body(
+                                              context,
+                                              size: 12.5,
+                                              color: PosColors.textSecondary,
+                                            ),
                                           ),
                                           trailing: Text(
                                             '\$${o.total.toStringAsFixed(2)}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                            style: PosTypography.mono(
+                                              context,
+                                              size: 14.5,
+                                              color: PosColors.skyPulse,
                                             ),
                                           ),
                                         );
@@ -101,34 +154,90 @@ class DashboardScreen extends StatelessWidget {
                     flex: 2,
                     child: Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Low Stock Items (<= 5)',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.inventory_rounded,
+                                  color: PosColors.warning,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Low Stock (<= 5)',
+                                  style: PosTypography.display(
+                                    context,
+                                    size: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const Divider(),
+                            const SizedBox(height: 12),
+                            const Divider(height: 1),
                             Expanded(
                               child: store.lowStockProducts.isEmpty
-                                  ? const Center(
-                                      child: Text('All stock levels healthy.'),
+                                  ? Center(
+                                      child: Text(
+                                        'All inventory levels look healthy.',
+                                        style: PosTypography.body(
+                                          context,
+                                          color: PosColors.textSecondary,
+                                        ),
+                                      ),
                                     )
-                                  : ListView.builder(
+                                  : ListView.separated(
                                       itemCount: store.lowStockProducts.length,
+                                      separatorBuilder: (_, _) =>
+                                          const Divider(height: 1),
                                       itemBuilder: (_, i) {
                                         final p = store.lowStockProducts[i];
                                         return ListTile(
-                                          title: Text(p.name),
-                                          subtitle: Text(p.category),
-                                          trailing: Chip(
-                                            label: Text('${p.stock} left'),
-                                            backgroundColor:
-                                                Colors.orange.shade100,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                                vertical: 2,
+                                              ),
+                                          title: Text(
+                                            p.name,
+                                            style: PosTypography.body(
+                                              context,
+                                              weight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            p.category,
+                                            style: PosTypography.body(
+                                              context,
+                                              size: 12,
+                                              color: PosColors.textSecondary,
+                                            ),
+                                          ),
+                                          trailing: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: PosColors.warning
+                                                  .withValues(alpha: 0.14),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: PosColors.warning
+                                                    .withValues(alpha: 0.4),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              '${p.stock} left',
+                                              style: PosTypography.mono(
+                                                context,
+                                                size: 11.5,
+                                                color: PosColors.warning,
+                                              ),
+                                            ),
                                           ),
                                         );
                                       },
@@ -153,45 +262,51 @@ class _KpiCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final Color color;
+  final Color accent;
 
   const _KpiCard({
     required this.title,
     required this.value,
     required this.icon,
-    required this.color,
+    required this.accent,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 220,
+      width: 230,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              CircleAvatar(
-                backgroundColor: color.withValues(alpha: 0.15),
-                child: Icon(icon, color: color),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: accent.withValues(alpha: 0.35)),
+                ),
+                child: Icon(icon, color: accent, size: 22),
               ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: PosTypography.body(
+                        context,
+                        size: 12,
+                        color: PosColors.textSecondary,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(value, style: PosTypography.mono(context, size: 20)),
+                  ],
+                ),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'presentation/pos_store.dart';
+import 'presentation/pos_theme.dart';
 import 'presentation/screens/auth_screen.dart';
 import 'presentation/screens/main_shell_screen.dart';
 
@@ -29,10 +30,7 @@ class _PosAppState extends State<PosApp> {
     return MaterialApp(
       title: 'POS System',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: buildBlueBlackTheme(),
       home: ListenableBuilder(
         listenable: _store,
         builder: (context, _) {

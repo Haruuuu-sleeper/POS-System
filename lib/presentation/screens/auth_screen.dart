@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../pos_store.dart';
+import '../pos_theme.dart';
 
 class AuthScreen extends StatefulWidget {
   final PosStore store;
@@ -87,50 +88,86 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0, -0.35),
+            radius: 1.1,
+            colors: [Color(0xFF13294B), PosColors.abyssBlack],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: PosColors.elevatedCard,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: PosColors.borderSubtle),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x88000000),
+                        blurRadius: 32,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Icon(
-                          Icons.point_of_sale_rounded,
-                          size: 48,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _isLogin ? 'POS Sign In' : 'Create Staff Account',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        Center(
+                          child: Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  PosColors.electricBlue,
+                                  PosColors.cobaltGlow,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x553B82F6),
+                                  blurRadius: 18,
+                                  offset: Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.point_of_sale_rounded,
+                              size: 32,
+                              color: Colors.white,
+                            ),
                           ),
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          _isLogin ? 'Welcome Back' : 'Create Staff Account',
+                          textAlign: TextAlign.center,
+                          style: PosTypography.display(context, size: 24),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           _isLogin
-                              ? 'Sign in with your account (Demo Admin: admin@pos.local / password123)'
-                              : 'Register a cashier account to access the POS register',
+                              ? 'Demo Admin: admin@pos.local  •  password123'
+                              : 'Register a cashier account to access the register',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                          style: PosTypography.body(
+                            context,
+                            size: 13,
+                            color: PosColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -141,7 +178,6 @@ class _AuthScreenState extends State<AuthScreen> {
                             decoration: const InputDecoration(
                               labelText: 'Full Name',
                               prefixIcon: Icon(Icons.person_outline),
-                              border: OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (_isLogin) return null;
@@ -151,7 +187,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
                         ],
                         TextFormField(
                           controller: _emailController,
@@ -160,7 +196,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           decoration: const InputDecoration(
                             labelText: 'Email',
                             prefixIcon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
                           ),
                           validator: (value) {
                             final trimmed = value?.trim() ?? '';
@@ -174,7 +209,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
@@ -183,7 +218,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outline),
-                            border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
                               tooltip: _obscurePassword
                                   ? 'Show password'
@@ -192,6 +226,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
+                                color: PosColors.textSecondary,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -212,30 +247,54 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         if (_errorMessage != null) ...[
                           const SizedBox(height: 12),
-                          Text(
-                            _errorMessage!,
-                            style: TextStyle(color: colorScheme.error),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: PosColors.danger.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: PosColors.danger.withValues(alpha: 0.4),
+                              ),
+                            ),
+                            child: Text(
+                              _errorMessage!,
+                              style: PosTypography.body(
+                                context,
+                                size: 12.5,
+                                color: PosColors.danger,
+                              ),
+                            ),
                           ),
                         ],
-                        const SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: _isSubmitting ? null : _submit,
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                        const SizedBox(height: 22),
+                        SizedBox(
+                          height: 48,
+                          child: FilledButton(
+                            onPressed: _isSubmitting ? null : _submit,
+                            child: _isSubmitting
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    _isLogin ? 'Sign In' : 'Create Account',
+                                    style: const TextStyle(fontSize: 15),
                                   ),
-                                )
-                              : Text(_isLogin ? 'Sign In' : 'Sign Up'),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         TextButton(
                           onPressed: _isSubmitting ? null : _toggleMode,
+                          style: TextButton.styleFrom(
+                            foregroundColor: PosColors.skyPulse,
+                          ),
                           child: Text(
                             _isLogin
                                 ? "Don't have an account? Sign Up"
