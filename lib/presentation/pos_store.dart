@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-enum UserRole { admin, cashier }
+enum UserRole { admin, manager, cashier }
 
 class AppUser {
   final String id;

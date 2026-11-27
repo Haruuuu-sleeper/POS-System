@@ -31,11 +31,14 @@ class _MainShellScreenState extends State<MainShellScreen> {
       listenable: widget.store,
       builder: (context, _) {
         final user = widget.store.currentUser;
-        final isAdmin = user?.role == UserRole.admin;
+        final role = user?.role ?? UserRole.cashier;
+        final canManageStore =
+            role == UserRole.admin || role == UserRole.manager;
+        final canManageUsers = role == UserRole.admin;
         final wide = MediaQuery.of(context).size.width >= 960;
 
         final navItems = <({String label, IconData icon, Widget page})>[
-          if (isAdmin)
+          if (canManageStore)
             (
               label: 'Dashboard',
               icon: Icons.space_dashboard_rounded,
@@ -46,7 +49,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
             icon: Icons.point_of_sale_rounded,
             page: PosScreen(store: widget.store),
           ),
-          if (isAdmin)
+          if (canManageStore)
             (
               label: 'Products & Stock',
               icon: Icons.inventory_2_rounded,
@@ -57,7 +60,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
             icon: Icons.receipt_long_rounded,
             page: OrdersScreen(store: widget.store),
           ),
-          if (isAdmin)
+          if (canManageUsers)
             (
               label: 'Users & Roles',
               icon: Icons.admin_panel_settings_rounded,
@@ -69,7 +72,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
             ? 0
             : _selectedIndex;
         final name = user?.fullName ?? 'Staff';
-        final roleLabel = (user?.role.name ?? 'cashier').toUpperCase();
+        final roleLabel = role.name.toUpperCase();
 
         return Scaffold(
           body: Row(
