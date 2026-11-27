@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-
 import '../pos_store.dart';
 import '../pos_theme.dart';
 
@@ -18,12 +17,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void _openProductForm({Product? existing}) {
     final nameCtrl = TextEditingController(text: existing?.name ?? '');
     final catCtrl = TextEditingController(text: existing?.category ?? 'Drinks');
-    final priceCtrl = TextEditingController(
-      text: existing?.price.toString() ?? '',
-    );
-    final stockCtrl = TextEditingController(
-      text: existing?.stock.toString() ?? '10',
-    );
+    final priceCtrl = TextEditingController(text: existing?.price.toString() ?? '');
+    final stockCtrl = TextEditingController(text: existing?.stock.toString() ?? '10');
 
     showDialog(
       context: context,
@@ -34,42 +29,39 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ),
         content: SizedBox(
           width: 360,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Product Name'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: catCtrl,
-                decoration: const InputDecoration(labelText: 'Category'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: priceCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(labelText: 'Product Name'),
                 ),
-                decoration: const InputDecoration(labelText: 'Price (\$)'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: stockCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Stock Quantity'),
-              ),
-            ],
+                const SizedBox(height: 12),
+                TextField(
+                  controller: catCtrl,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: priceCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(labelText: 'Price (\$)'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: stockCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Stock Quantity'),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: PosColors.textSecondary),
-            ),
+            child: const Text('Cancel', style: TextStyle(color: PosColors.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -79,9 +71,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               widget.store.saveProduct(
                 id: existing?.id,
                 name: nameCtrl.text.trim(),
-                category: catCtrl.text.trim().isEmpty
-                    ? 'General'
-                    : catCtrl.text.trim(),
+                category: catCtrl.text.trim().isEmpty ? 'General' : catCtrl.text.trim(),
                 price: price,
                 stock: stock,
               );
@@ -96,30 +86,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isNarrow = MediaQuery.of(context).size.width < 700;
     final items = widget.store.products
         .where(
           (p) =>
-              p.name.toLowerCase().contains(_query.toLowerCase()) ||
-              p.category.toLowerCase().contains(_query.toLowerCase()),
-        )
+      p.name.toLowerCase().contains(_query.toLowerCase()) ||
+          p.category.toLowerCase().contains(_query.toLowerCase()),
+    )
         .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products & Inventory'),
+        title: const Text('Products'),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 18),
+            padding: const EdgeInsets.only(right: 12),
             child: FilledButton.icon(
               icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('New Product'),
+              label: Text(isNarrow ? 'Add' : 'New Product'),
               onPressed: () => _openProductForm(),
             ),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isNarrow ? 12 : 20),
         child: Column(
           children: [
             TextField(
@@ -129,7 +120,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ),
               onChanged: (v) => setState(() => _query = v),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Expanded(
               child: Card(
                 child: ListView.separated(
@@ -140,74 +131,92 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     final p = items[i];
                     final isLow = p.stock <= 5;
 
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 6,
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isNarrow ? 12 : 18,
+                        vertical: 10,
                       ),
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: PosColors.deepNavyTint,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.inventory_2_outlined,
-                          color: PosColors.skyPulse,
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        p.name,
-                        style: PosTypography.body(
-                          context,
-                          weight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Row(
+                      child: Row(
                         children: [
-                          Text(
-                            p.category,
-                            style: PosTypography.body(
-                              context,
-                              size: 12.5,
-                              color: PosColors.textSecondary,
+                          Container(
+                            padding: const EdgeInsets.all(9),
+                            decoration: BoxDecoration(
+                              color: PosColors.deepNavyTint,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.inventory_2_outlined,
+                              color: PosColors.skyPulse,
+                              size: 18,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Stock: ${p.stock}',
-                            style: PosTypography.mono(
-                              context,
-                              size: 12,
-                              color: isLow
-                                  ? PosColors.warning
-                                  : PosColors.textSecondary,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  p.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: PosTypography.body(
+                                    context,
+                                    size: 14,
+                                    weight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 2,
+                                  children: [
+                                    Text(
+                                      p.category,
+                                      style: PosTypography.body(
+                                        context,
+                                        size: 12,
+                                        color: PosColors.textSecondary,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Stock: ${p.stock}',
+                                      style: PosTypography.mono(
+                                        context,
+                                        size: 11.5,
+                                        color: isLow
+                                            ? PosColors.warning
+                                            : PosColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+                          const SizedBox(width: 8),
                           Text(
                             '\$${p.price.toStringAsFixed(2)}',
                             style: PosTypography.mono(
                               context,
-                              size: 15,
+                              size: 14,
                               color: PosColors.skyPulse,
                             ),
                           ),
-                          const SizedBox(width: 12),
                           IconButton(
                             tooltip: 'Edit / Restock',
-                            icon: const Icon(Icons.edit_outlined),
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.only(left: 6),
+                            icon: const Icon(Icons.edit_outlined, size: 19),
                             color: PosColors.skyPulse,
                             onPressed: () => _openProductForm(existing: p),
                           ),
                           IconButton(
                             tooltip: 'Delete',
-                            icon: const Icon(Icons.delete_outline),
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.only(left: 4),
+                            icon: const Icon(Icons.delete_outline, size: 19),
                             color: PosColors.danger,
                             onPressed: () => widget.store.deleteProduct(p.id),
                           ),

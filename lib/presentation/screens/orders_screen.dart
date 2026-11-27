@@ -60,55 +60,75 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (_, i) {
                           final o = orders[i];
-                          return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 18,
-                              vertical: 6,
+                              vertical: 10,
                             ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: PosColors.deepNavyTint,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.receipt_long_rounded,
-                                color: PosColors.skyPulse,
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(
-                              o.invoiceNo,
-                              style: PosTypography.mono(context, size: 14),
-                            ),
-                            subtitle: Text(
-                              '${o.createdAt.toString().substring(0, 16)} • ${o.cashierName}',
-                              style: PosTypography.body(
-                                context,
-                                size: 12.5,
-                                color: PosColors.textSecondary,
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            child: Row(
                               children: [
-                                Text(
-                                  '\$${o.total.toStringAsFixed(2)}',
-                                  style: PosTypography.mono(
-                                    context,
-                                    size: 15,
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: PosColors.deepNavyTint,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.receipt_long_rounded,
                                     color: PosColors.skyPulse,
+                                    size: 20,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                OutlinedButton.icon(
-                                  icon: const Icon(
-                                    Icons.visibility_outlined,
-                                    size: 15,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        o.invoiceNo,
+                                        style: PosTypography.mono(context, size: 14),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        '${o.createdAt.toString().substring(0, 16)} • ${o.cashierName}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: PosTypography.body(
+                                          context,
+                                          size: 12.5,
+                                          color: PosColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  label: const Text('Receipt'),
-                                  onPressed: () =>
-                                      showReceiptDialog(context, o),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '\$${o.total.toStringAsFixed(2)}',
+                                      style: PosTypography.mono(
+                                        context,
+                                        size: 15,
+                                        color: PosColors.skyPulse,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        visualDensity: VisualDensity.compact,
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.visibility_outlined,
+                                        size: 14,
+                                      ),
+                                      label: const Text('Receipt', style: TextStyle(fontSize: 12)),
+                                      onPressed: () =>
+                                          showReceiptDialog(context, o),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
