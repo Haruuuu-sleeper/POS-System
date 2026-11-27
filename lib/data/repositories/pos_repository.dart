@@ -7,12 +7,7 @@ class PosRepository {
   final AppDatabase _db;
   final ProductRemoteDataSource _remoteDataSource;
 
-  PosRepository({
-    required AppDatabase db,
-    required ProductRemoteDataSource remoteDataSource,
-  }) : _db = db,
-       _remoteDataSource = remoteDataSource;
-
+  PosRepository(this._db, this._remoteDataSource);
   // --- READ / WATCH (Local Drift DB) ---
 
   Stream<List<Product>> watchProducts({bool onlyActive = true}) {
