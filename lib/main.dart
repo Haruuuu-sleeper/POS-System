@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:pos_system/presentation/screens/auth_screen.dart';
 
+// import 'presentation/screens/main_shell_screen.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const PosApp());

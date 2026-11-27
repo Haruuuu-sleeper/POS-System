@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../pos_store.dart';
 
@@ -55,8 +55,9 @@ class UsersScreen extends StatelessWidget {
             FilledButton(
               onPressed: () {
                 if (nameCtrl.text.trim().isEmpty ||
-                    userCtrl.text.trim().isEmpty)
+                    userCtrl.text.trim().isEmpty) {
                   return;
+                }
                 store.addUser(
                   nameCtrl.text.trim(),
                   userCtrl.text.trim(),
@@ -91,7 +92,7 @@ class UsersScreen extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: store.users.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (_, i) {
           final u = store.users[i];
           return ListTile(
