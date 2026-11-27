@@ -3,6 +3,16 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 part 'app_database.g.dart';
 
+class Users extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get fullName => text()();
+  TextColumn get email => text().unique()();
+  TextColumn get passwordHash => text()();
+  TextColumn get role => text().withDefault(const Constant('cashier'))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 class Products extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get sku => text().nullable()();
@@ -47,12 +57,24 @@ class CheckoutLineInput {
   });
 }
 
-@DriftDatabase(tables: [Products, Orders, OrderItems])
+@DriftDatabase(tables: [Users, Products, Orders, OrderItems])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 2) {
+        await m.createTable(users);
+      }
+    },
+  );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'pos_system_db');
